@@ -20,7 +20,7 @@ let rec poly_add p1 p2 =
           poly_add p1'.suite p2'.suite  (* On ignore les termes dont le coefficient est 0 *)
         else
           Some { coef = coef_sum; degree = p1'.degree; suite = poly_add p1'.suite p2'.suite }
-      else if p1'.degree < p2'.degree then
+      else if p1'.degree > p2'.degree then
         Some { coef = p1'.coef; degree = p1'.degree; suite = poly_add p1'.suite (Some p2') }
       else
         Some { coef = p2'.coef; degree = p2'.degree; suite = poly_add (Some p1') p2'.suite }
