@@ -26,6 +26,25 @@ let rec poly_add p1 p2 =
         Some { coef = p2'.coef; degree = p2'.degree; suite = poly_add (Some p1') p2'.suite }
 ;;
 
+(* Fonction auxiliaire pour afficher un polynôme *)
+let rec print_polynome poly =
+  match poly with
+  | None -> print_endline "0"
+  | Some { coef; degree; suite } ->
+      (* Si le coefficient est 0, on passe au suivant *)
+      if coef <> 0 then
+        begin
+          Printf.printf "%dx^%d " coef degree;
+          (* Si la suite existe, on ajoute le signe "+" et on affiche la suite *)
+          match suite with
+          | None -> print_newline ()
+          | Some _ -> print_string "+ "; print_polynome suite
+        end
+      else
+        (* Si le coefficient est 0, on passe à la suite *)
+        print_polynome suite
+;;
+
 
 (*Q4*)
 
@@ -63,7 +82,7 @@ let gen_permutation n =
   aux (List.init n (fun i -> i + 1)) []  (* On initialise L avec les entiers 1 à n grâce à List.init, et P comme liste vide *)
 ;;
 
-(*Q12  -  Il me faut vraiment la question 11 pour celle-là sinon je vois pas trop quoi faire :(( *)
+(*Q12*)
 
 
 (*Q15*)
@@ -72,3 +91,40 @@ let gen_permutation n =
 
 
 (*TESTING*)
+
+let p1 = Some {
+  coef = 3; degree = 2; suite = Some {
+    coef = -5; degree = 1; suite = Some {
+      coef = 7; degree = 0; suite = None
+    }
+  }
+};;
+
+let p2 = Some {
+  coef = 2; degree = 3; suite = Some {
+    coef = 5; degree = 1; suite = Some {
+      coef = -7; degree = 0; suite = None
+    }
+  }
+};;
+
+let () =
+  print_endline "Polynôme 1 :";
+  print_polynome p1;
+  print_endline "Polynôme 2 :";
+  print_polynome p2;
+
+  (* Test pour Q3 *)
+  let result = poly_add p1 p2 in
+  print_endline "Résultat de l'addition :";
+  print_polynome result;
+;;
+
+(* Resultat attendu : 
+Polynôme 1 :
+3x^2 + -5x^1 + 7x^0 
+Polynôme 2 :
+2x^3 + 5x^1 + -7x^0 
+Résultat de l'addition :
+2x^3 + 3x^2
+*)
