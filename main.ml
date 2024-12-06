@@ -82,10 +82,62 @@ let gen_permutation n =
   aux (List.init n (fun i -> i + 1)) []  (* On initialise L avec les entiers 1 à n grâce à List.init, et P comme liste vide *)
 ;;
 
+
+(* Fonctions utilitaires pour la Q12 *)
+(* Permettent de vérifier les conditions de la grammaire 2 *)
+let verif_add left right =
+  match (left, right) with
+  | (Add l1, Add l2) -> Add (l1 @ l2)  (* On fusionne deux additions *)
+  | (Add l, e) | (e, Add l) -> Add (l @ [e])  (* On fusionne une addition avec une autre expression *)
+  | (v, w) -> Add [v; w]  (* Cas général : on crée une addition avec les deux expressions *)
+;;
+
+let verif_mul left right = 
+  match (left, right) with
+  | (Mul l1, Mul l2) -> Mul(l1 @ l2)
+  | (Mul l, e) | (e, Mul l) -> Mul(l @ [e])
+  | (v, w) -> Mul [v; w]
+;;
+
+let verif_pow base exp =
+  match exp with 
+  | Int n when n > 0 ->  (* Si l'exposant est un entier strictement positif *)
+      (match base with
+       | Pow(Var"x", 1) -> Pow(Var "x", n)  (* Si on lit un Pow(Var "x", 1), on va l'ignorer et mettre la bonne puissance -> permet d'éviter les pow imbriqués inutiles *)
+       | _ -> Pow(base, n))  (* Traitement normal si les pow ne sont pas imbriqués *)
+  | Int _ -> failwith "Exposant invalide : doit être strictement positif"
+  | _ -> failwith "Exposant invalide : doit être un entier" 
+;;
+
 (*Q12*)
+let rec gen_arb a =
+  match a with
+  | V -> failwith "Arbre vide, pas d'expression à générer"
+  | Node (v, g, d) ->
+      (* Cas des opérateurs *)
+      if v = "+" then
+        let left = gen_arb g in  (* On transforme g et d en sous-arbre avant de les envoyer a verif_add *)
+        let right = gen_arb d in
+        verif_add left right
+      else if v = "*" then
+        let left = gen_arb g in  (* On transforme g et d en sous-arbre avant de les envoyer a verif_mul *)
+        let right = gen_arb d in
+        verif_mul left right
+      else if v = "^" then
+        let base = gen_arb g in  (* On transforme g et d en sous-arbre avant de les envoyer a verif_pow *)
+        let exponent = gen_arb d in
+        verif_pow base exponent
+      else if v = "x" then
+        (* Cas de x : on assure de rajouter une puissance de 1 à tous les x (redondances gérées dans verif_pow) *)
+        Pow(Var "x", 1)
+      else
+        (* Cas d'un entier *)
+        Int (int_of_string v)
+;;
 
 
 (*Q15*)
+
 
 (*Q18*)
 
@@ -118,13 +170,29 @@ let () =
   let result = poly_add p1 p2 in
   print_endline "Résultat de l'addition :";
   print_polynome result;
-;;
 
-(* Resultat attendu : 
-Polynôme 1 :
-3x^2 + -5x^1 + 7x^0 
-Polynôme 2 :
-2x^3 + 5x^1 + -7x^0 
-Résultat de l'addition :
-2x^3 + 3x^2
-*)
+  (* Resultat attendu : 
+  Polynôme 1 :
+  3x^2 + -5x^1 + 7x^0 
+  Polynôme 2 :
+  2x^3 + 5x^1 + -7x^0 
+  Résultat de l'addition :
+  2x^3 + 3x^2
+  *)
+
+  (* Test pour Q12 *)
+  let abr = list2abr [2; 1; 3; 4];;
+  (* Arbre de droite dans la figure 1 du sujet *)
+  let abr_etiquete = Node("+", Node("*", Node("123", V, V), Node("x", V, V)), Node("+", Node("42", V, V), Node("^", Node("x",V, V), Node("3", V, V))))
+
+  Printf.printf "Arbre étiqueté : ";
+  print_arbre_etiquete abr_etiquete;
+  Printf.printf "\n";
+
+  let expression = gen_arb abr_etiquete;;
+
+  (* Résultat attendu : arbre de gauche de la figure 1 du sujet
+    Add[Int 42; Pow(Var "x", 3); Mul[Int 123, Pow(Var "x", 1)]]
+  *)
+
+;;
