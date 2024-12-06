@@ -160,39 +160,39 @@ let p2 = Some {
   }
 };;
 
-let () =
-  print_endline "Polynôme 1 :";
-  print_polynome p1;
-  print_endline "Polynôme 2 :";
-  print_polynome p2;
+print_endline "Polynôme 1 :";
+print_polynome p1;
+print_endline "Polynôme 2 :";
+print_polynome p2;
 
-  (* Test pour Q3 *)
-  let result = poly_add p1 p2 in
-  print_endline "Résultat de l'addition :";
-  print_polynome result;
+(* Test pour Q3 *)
+let result = poly_add p1 p2 in
+print_endline "Résultat de l'addition :";
+print_polynome result;
 
-  (* Resultat attendu : 
-  Polynôme 1 :
-  3x^2 + -5x^1 + 7x^0 
-  Polynôme 2 :
-  2x^3 + 5x^1 + -7x^0 
-  Résultat de l'addition :
-  2x^3 + 3x^2
-  *)
+(* Resultat attendu : 
+Polynôme 1 :
+3x^2 + -5x^1 + 7x^0 
+Polynôme 2 :
+2x^3 + 5x^1 + -7x^0 
+Résultat de l'addition :
+2x^3 + 3x^2
+*)
 
-  (* Test pour Q12 *)
-  let abr = list2abr [2; 1; 3; 4];;
-  (* Arbre de droite dans la figure 1 du sujet *)
-  let abr_etiquete = Node("+", Node("*", Node("123", V, V), Node("x", V, V)), Node("+", Node("42", V, V), Node("^", Node("x",V, V), Node("3", V, V))))
+(*
+(* Test pour Q12 *)
+let abr = list2abr [2; 1; 3; 4];;
+(* Arbre de droite dans la figure 1 du sujet *)
+let abr_etiquete = Node("+", Node("*", Node("123", V, V), Node("x", V, V)), Node("+", Node("42", V, V), Node("^", Node("x",V, V), Node("3", V, V))))
 
-  Printf.printf "Arbre étiqueté : ";
-  print_arbre_etiquete abr_etiquete;
-  Printf.printf "\n";
+Printf.printf "Arbre étiqueté : ";
+print_arbre_etiquete abr_etiquete;
+Printf.printf "\n";
 
-  let expression = gen_arb abr_etiquete;;
+let expression = gen_arb abr_etiquete;;
 
-  (* Résultat attendu : arbre de gauche de la figure 1 du sujet
-    Add[Int 42; Pow(Var "x", 3); Mul[Int 123, Pow(Var "x", 1)]]
-  *)
-
+(* Résultat attendu : arbre de gauche de la figure 1 du sujet
+  Add[Int 42; Pow(Var "x", 3); Mul[Int 123, Pow(Var "x", 1)]]
+*)
+*)
 ;;
