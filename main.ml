@@ -104,8 +104,13 @@ let verif_pow base exp =
   | Int n when n > 0 ->  (* Si l'exposant est un entier strictement positif *)
       (match base with
        | Pow(Var"x", 1) -> Pow(Var "x", n)  (* Si on lit un Pow(Var "x", 1), on va l'ignorer et mettre la bonne puissance -> permet d'éviter les pow imbriqués inutiles *)
+       | Int b when b = 0 -> Int b
        | _ -> Pow(base, n))  (* Traitement normal si les pow ne sont pas imbriqués *)
-  | Int _ -> failwith "Exposant invalide : doit être strictement positif"
+  | Int n when n = 0 -> 
+      (match base with
+       | Int b when b = 0 -> failwith "0^0 est strictement interdit"
+       | _ -> Int 1)
+  | Int _ -> failwith "Exposant invalide : doit être un entier positif"
   | _ -> failwith "Exposant invalide : doit être un entier" 
 ;;
 
