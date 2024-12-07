@@ -138,6 +138,47 @@ let rec gen_arb a =
 
 (*Q15*)
 
+let rec split_at n l =
+  if n = 0 then
+    ([], l)  
+  else
+    match l with
+    | [] -> ([], []) 
+    | head :: tail ->
+        let (left, right) = split_at (n - 1) tail in 
+        (head :: left, right)  
+;;
+
+(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur produit : version naive *)
+let expr_list_to_polynomial_product_naif (expr_list : expr list) : polynome option =
+  let polys = List.map arb2poly expr_list in
+  let rec multiply_polynomials polynomes =
+    match polynomes with
+    | [] -> None 
+    | [p] -> p   
+    | p1 :: p2 :: rest -> multiply_polynomials(poly_prod p1 p2 :: rest)
+  in 
+  multiply_polynomials polys
+;; 
+
+(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur produit : version diviser pour régner *)
+let expr_list_to_polynomial_product_divide (expr_list : expr list) : polynome option =
+  let polys = List.map arb2poly expr_list in
+  let rec multiply_polynomials_rec polynomes =
+    match polynomes with
+    | [] -> Some {coef = 1; degree = 0; suite = None}  
+    | [p] -> p 
+    | _ ->
+        let n = List.length polynomes / 2 in
+        let left, right = split_at n polynomes in
+        let left_product = multiply_polynomials_rec left in
+        let right_product = multiply_polynomials_rec right in
+        match left_product, right_product with
+        | lp, rp -> poly_prod lp rp 
+  in
+  multiply_polynomials_rec polys
+;;
+
 
 (*Q18*)
 
