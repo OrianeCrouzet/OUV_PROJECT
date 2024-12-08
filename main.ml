@@ -337,7 +337,7 @@ let rec split_at n l =
         (head :: left, right)  
 ;;
 
-(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur produit : version naive *)
+(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur somme : version naive *)
 let expr_list_to_polynomial_sum_naif (expr_list : expr list) : polynome option =
   let polys = List.map arb2poly expr_list in
   let rec sum_polynomials polynomes =
@@ -349,7 +349,7 @@ let expr_list_to_polynomial_sum_naif (expr_list : expr list) : polynome option =
   sum_polynomials polys;
 ;; 
 
-(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur produit : version diviser pour régner *)
+(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur somme : version diviser pour régner *)
 let expr_list_to_polynomial_sum_divide (expr_list : expr list) : polynome option =
   let polys = List.map arb2poly expr_list in
   let rec sum_polynomials_rec polynomes =
@@ -366,6 +366,24 @@ let expr_list_to_polynomial_sum_divide (expr_list : expr list) : polynome option
   in
   sum_polynomials_rec polys
 ;;
+
+(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur somme : version accumulateur *)
+let expr_list_to_polynomial_sum_accumulate (expr_list : expr list) : polynome option =
+  let polys = List.map arb2poly expr_list in
+  let rec sum_with_acc polys acc =
+    match polys with
+    | [] -> acc
+    | p :: rest -> sum_with_acc rest (poly_add acc p)
+  in
+  sum_with_acc polys None
+;;
+
+(* Fonction pour transformer une liste d'expressions en polynômes et calculer leur somme : version List.fold_left *)
+let expr_list_to_polynomial_sum_fold (expr_list : expr list) : polynome option =
+  let polys = List.map arb2poly expr_list in
+  List.fold_left (fun acc p -> poly_add acc p) None polys
+;;
+
 
 (*Q15 et Q18*) 
 
@@ -533,26 +551,37 @@ print_polynome result;
 *) 
 
 
-(* Génération de 10 arbres binaires de recherche *)
-let n = 100 in
+(* Génération de n arbres binaires de recherche *)
+let n = 1000 in
 let (abr_list, time) = time_execution generation_exp n in
 Printf.printf "Affichage des %d ABR générés et transformés :\n" n;
 display_transformed_abrs abr_list;
 Printf.printf "\nTemps d'exécution : %.6f secondes\n" time;
 
 (* Exécution et mesure du temps pour la méthode naive *)
-let (res1, time1) = time_execution expr_list_to_polynomial_sum_naif abr_list in
-
+let (res_naif, time_naif) = time_execution expr_list_to_polynomial_sum_naif abr_list in 
 (* Exécution et mesure du temps pour la méthode diviser pour régner *)
-let (res2, time2) = time_execution expr_list_to_polynomial_sum_divide abr_list in
+let (res_divide, time_divide) = time_execution expr_list_to_polynomial_sum_divide abr_list in
+
+let (res_acc, time_acc) = time_execution expr_list_to_polynomial_sum_accumulate abr_list in
+let (res_fold, time_fold) = time_execution expr_list_to_polynomial_sum_fold abr_list in
 
 (* Affichage des résultats *)
 Printf.printf "Méthode naive :\n";
-print_polynome res1;
-Printf.printf "\nTemps d'exécution : %.6f secondes\n" time1;
+print_polynome res_naif;
+Printf.printf "\nTemps d'exécution naif : %.6f secondes\n" time_naif;
 
 Printf.printf "Méthode diviser pour régner :\n";
-print_polynome res2;
-Printf.printf "\nTemps d'exécution : %.6f secondes\n" time2;
+print_polynome res_divide;
+Printf.printf "\nTemps d'exécution divide : %.6f secondes\n" time_divide;
+
+Printf.printf "Méthode accumulateur :\n";
+print_polynome res_acc;
+Printf.printf "\nTemps d'exécution acc : %.6f secondes\n" time_acc;
+
+Printf.printf "Méthode fold :\n";
+print_polynome res_fold;
+Printf.printf "\nTemps d'exécution fold : %.6f secondes\n" time_fold;
+
 
 ;;
